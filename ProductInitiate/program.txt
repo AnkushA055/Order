@@ -1,0 +1,258 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ProjectProductADD
+{
+    class Program
+    {
+        static void Main(string[] args)
+        { int retailerid = 1;
+            List<Address> curraddress = new List<Address>();
+            bool n = true;
+           while(n){
+                Console.WriteLine("Choose :\n1\n2\n3");
+            int choice = int.Parse(Console.ReadLine());
+            if (choice == 2)
+            {
+                bool m = true;
+                while (m)
+                { 
+                Console.WriteLine("1.Add \n2.Print ");
+                int b = int.Parse(Console.ReadLine());
+                
+                if (b == 2)
+                     {
+                    int c = curraddress.Count;
+                            if (c == 0)
+                            {
+                                Console.WriteLine("No Address Added");
+                            }
+                            else
+                            {
+                                for (int item = 0; item < curraddress.Count; item++)
+                                {
+                                    Console.WriteLine(item + 1 + ". " + curraddress[item].line1 + " " + curraddress[item].city + " " + curraddress[item].pin);
+
+                                }
+                            }
+                      }
+                    if (b == 1)
+                    {
+                        Address new1 = new Address();
+                        Console.WriteLine("Enter line1 : ");
+                        new1.line1 = Console.ReadLine();
+                        Console.WriteLine("Enter city : ");
+                        new1.city = Console.ReadLine();
+                        Console.WriteLine("Enter pin : ");
+                        new1.pin = int.Parse(Console.ReadLine());
+                        curraddress.Add(new1);
+                        m = false;
+                    }
+                    //else
+                    //{
+                    //    Console.WriteLine("Choose :\n1\n2\n3");
+                    //    choice = int.Parse(Console.ReadLine());
+                        
+                    //}
+                }
+
+            }
+
+
+                if (choice == 1)
+                {
+                    List<Cart> currRetailer = new List<Cart>();
+                    List<Product> Pdisplay = new List<Product>();
+                    Pdisplay.Add(new Product(1, 10));
+                    Pdisplay.Add(new Product(2, 20));
+                    Pdisplay.Add(new Product(3, 30));
+                    Pdisplay.Add(new Product(4, 40));
+                    Pdisplay.Add(new Product(5, 50));
+
+
+
+                    bool answer = true;
+                    while (answer)
+                    {
+                        Console.WriteLine("Select Product : ");
+                        for (int item = 0; item < Pdisplay.Count; item++)
+                        {
+                            Console.WriteLine(item + 1 + ". " + Pdisplay[item].ProductId + " " + Pdisplay[item].cost);
+
+                        }
+                        int c = int.Parse(Console.ReadLine());
+                        if (c == 1)
+                        {
+                            Cart pro = new Cart();
+                            pro.retailerid = retailerid;
+                            pro.sProduct = Pdisplay[0].ProductId;
+                            Console.WriteLine("Enter quantity");
+                            pro.quantity = int.Parse(Console.ReadLine());
+                            pro.cp = Pdisplay[0].cost;
+                            pro.cp_quantity = pro.cp * pro.quantity;
+                            for (int item = 0; item < curraddress.Count; item++)
+                            {
+                                Console.WriteLine(item + 1 + ". " + curraddress[item].line1 + " " + curraddress[item].city + " " + curraddress[item].pin);
+
+                            }
+                            Console.WriteLine("Enter choice");
+                            int cw = int.Parse(Console.ReadLine());
+                            pro.c_line1 = curraddress[cw - 1].line1;
+                            pro.c_city = curraddress[cw - 1].city;
+                            pro.c_pin = curraddress[cw - 1].pin;
+                            currRetailer.Add(pro);
+
+
+                        }
+                        if (c == 2)
+                        {
+                            Cart pro = new Cart();
+                            pro.retailerid = retailerid;
+                            pro.sProduct = Pdisplay[1].ProductId;
+                            Console.WriteLine("Enter quantity");
+                            pro.quantity = int.Parse(Console.ReadLine());
+                            pro.cp = Pdisplay[1].cost;
+                            pro.cp_quantity = pro.cp * pro.quantity;
+                            for (int item = 0; item < curraddress.Count; item++)
+                            {
+                                Console.WriteLine(item + 1 + ". " + curraddress[item].line1 + " " + curraddress[item].city + " " + curraddress[item].pin);
+
+                            }
+                            Console.WriteLine("Enter choice");
+                            int cw = int.Parse(Console.ReadLine());
+                            pro.c_line1 = curraddress[cw - 1].line1;
+                            pro.c_city = curraddress[cw - 1].city;
+                            pro.c_pin = curraddress[cw - 1].pin;
+                            currRetailer.Add(pro);
+
+
+                        }
+                        if (c == 3)
+                        {
+                            Cart pro = new Cart();
+                            pro.retailerid = retailerid;
+                            pro.sProduct = Pdisplay[2].ProductId;
+                            Console.WriteLine("Enter quantity");
+                            pro.quantity = int.Parse(Console.ReadLine());
+                            pro.cp = Pdisplay[2].cost;
+                            pro.cp_quantity = pro.cp * pro.quantity;
+                            for (int item = 0; item < curraddress.Count; item++)
+                            {
+                                Console.WriteLine(item + 1 + ". " + curraddress[item].line1 + " " + curraddress[item].city + " " + curraddress[item].pin);
+
+                            }
+                            Console.WriteLine("Enter choice");
+                            int cw = int.Parse(Console.ReadLine());
+                            pro.c_line1 = curraddress[cw - 1].line1;
+                            pro.c_city = curraddress[cw - 1].city;
+                            pro.c_pin = curraddress[cw - 1].pin;
+                            currRetailer.Add(pro);
+
+
+                        }
+                        if (c == 4)
+                        {
+                            Cart pro = new Cart();
+                            pro.retailerid = retailerid;
+                            pro.sProduct = Pdisplay[3].ProductId;
+                            Console.WriteLine("Enter quantity");
+                            pro.quantity = int.Parse(Console.ReadLine());
+                            pro.cp = Pdisplay[3].cost;
+                            pro.cp_quantity = pro.cp * pro.quantity;
+                            for (int item = 0; item < curraddress.Count; item++)
+                            {
+                                Console.WriteLine(item + 1 + ". " + curraddress[item].line1 + " " + curraddress[item].city + " " + curraddress[item].pin);
+
+                            }
+                            Console.WriteLine("Enter choice");
+                            int cw = int.Parse(Console.ReadLine());
+                            pro.c_line1 = curraddress[cw - 1].line1;
+                            pro.c_city = curraddress[cw - 1].city;
+                            pro.c_pin = curraddress[cw - 1].pin;
+                            currRetailer.Add(pro);
+
+
+                        }
+                        if (c == 5)
+                        {
+                            Cart pro = new Cart();
+                            pro.retailerid = retailerid;
+                            pro.sProduct = Pdisplay[4].ProductId;
+                            Console.WriteLine("Enter quantity");
+                            pro.quantity = int.Parse(Console.ReadLine());
+                            pro.cp = Pdisplay[4].cost;
+                            pro.cp_quantity = pro.cp * pro.quantity;
+                            for (int item = 0; item < curraddress.Count; item++)
+                            {
+                                Console.WriteLine(item + 1 + ". " + curraddress[item].line1 + " " + curraddress[item].city + " " + curraddress[item].pin);
+
+                            }
+                            Console.WriteLine("Enter choice");
+                            int cw = int.Parse(Console.ReadLine());
+                            pro.c_line1 = curraddress[cw - 1].line1;
+                            pro.c_city = curraddress[cw - 1].city;
+                            pro.c_pin = curraddress[cw - 1].pin;
+                            currRetailer.Add(pro);
+
+
+                        }
+                        Console.WriteLine("Add more products?(y/n)");
+                        string ans = Console.ReadLine();
+                        if (ans == "y")
+                            answer = true;
+                        else
+                            answer = false;
+
+                    }
+                    int TotalAmount = 0;
+                    for (int item = 0; item < currRetailer.Count; item++)
+                    {
+                        Console.WriteLine(item + 1 + ". " + currRetailer[item].retailerid + " " + currRetailer[item].sProduct + " " + currRetailer[item].quantity + " " + currRetailer[item].cp + " " + currRetailer[item].cp_quantity + " " + currRetailer[item].c_line1 + " " + currRetailer[item].c_city + " " + currRetailer[item].c_pin);
+                        TotalAmount = TotalAmount + currRetailer[item].cp_quantity;
+                    }
+                    Console.WriteLine("Total Amount : " + TotalAmount);
+                    Console.WriteLine("Pay(y/n)? : ");
+                    string confirm = Console.ReadLine();
+                    if (confirm == "y")
+                        n = false;
+                }    
+
+                
+            } }
+    }
+    public class Product
+    {
+        public int ProductId;
+        public int cost;
+        public Product(int a, int b)
+        {
+            this.ProductId = a;
+            this.cost = b;
+        }
+    }
+    public class Cart
+    {
+        public int retailerid;
+        public int sProduct;
+        public int quantity;
+        public int cp;
+        public int cp_quantity;
+        public string c_line1;
+        public string c_city;
+        public int c_pin;
+       // public string address;
+    }
+    public class Address
+    {
+        public int retailerid;
+        public string line1;
+        public string city;
+        public int pin;
+        
+    }
+}
+
+     
