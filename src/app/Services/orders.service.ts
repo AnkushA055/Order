@@ -55,8 +55,9 @@ export class OrdersService {
 
 
 
-
-
+@Injectable({
+  providedIn: 'root'
+})
 export class OrderDetailsService {
   constructor(private httpClient: HttpClient) {
   }

@@ -72,22 +72,33 @@
               <input type="text" disabled="disabled" class="form-control" id="originalPrice" formControlName="originalPrice" />
             </div>
           </div>
-    
 
-        <div class="form-group form-row" *ngIf="viewDiscountedPrice">
-          <label for="discountedPrice" class="col-form-label col-md-4">Current Price :</label>
-          <div class="col-md-8">
-            <input type="text" style="color:darkgreen" disabled="disabled" class="form-control" id="discountedPrice" formControlName="sellingPrice" />
+
+          <div class="form-group form-row" *ngIf="viewDiscountedPrice">
+            <label for="discountedPrice" class="col-form-label col-md-4">Current Price :</label>
+            <div class="col-md-8">
+              <input type="text" style="color:darkgreen" disabled="disabled" class="form-control" id="discountedPrice" formControlName="sellingPrice" />
+            </div>
+          </div>
+
+
+          <div class="input-group input-group-sm mb-3 col-xs-2" style="width:60%; ">
+            <div class="input-group-prepend input-group-sm">
+              <span type = "button" class="input-group-btn hand-icon form-control" id="subtract" (click)="onQuantityDecrementClick()">-</span>
+            </div>
+            <input type="text" disabled="disabled" class="form-control col-2" formControlName="quantity"/>
+            <div class="input-group-append input-group-sm">
+              <span type ="button"class="input-group-btn  hand-icon form-control" id="add" (click)="onQuantityIncrementClick()">+</span>
+            </div>
+          </div>
+
+
+          <div class="modal-footer">
+
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" (click)="onClickAddToCart()">Add To Cart</button>
           </div>
         </div>
-
-
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Add To Cart</button>
-        </div>
-      </div>
       </div>
   </div>
     </div>

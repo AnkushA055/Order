@@ -13,8 +13,7 @@ import { Product } from '../../Models/Product';
   templateUrl: './neworder.component.html',
   styleUrls: ['./neworder.component.scss']
 })
-export class NewOrdersComponent extends GreatOutdoorsComponentBase implements OnInit
-{
+export class NewOrdersComponent extends GreatOutdoorsComponentBase implements OnInit {
 
   viewProductForm: FormGroup;
   viewDiscountedPrice: boolean = false;
@@ -22,7 +21,14 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
   discountAv: number = 0;
   price: number;
   currentProduct: OrderDetail;
-
+  currentCartObject: OrderDetail;
+  currentIndex: number;
+  currentQuantity: number = 1;
+  maxStock: number = 0;
+  actualSellingPrice: number = 0;
+  orderDetails: OrderDetail[] = [];
+  products: Product[] = [];
+  orderDetailsForId: OrderDetail[] = [];
 
 
 
@@ -35,10 +41,10 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
   showCat5div: boolean = false;
   categorySelected: string;
   //product response
-  products: Product[] = [];
+ 
 
 
-  constructor(private productsService: ProductsService) {
+  constructor(private productsService: ProductsService,private orderDetailService : OrderDetailsService) {
 
     super();
     //constructor for viewing product specific details
@@ -48,7 +54,7 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
       productName: new FormControl(null),
       image: new FormControl(null),
       size: new FormControl(null),
-      colour : new FormControl(null),
+      colour: new FormControl(null),
       techSpecs: new FormControl(null),
       sellingPrice: new FormControl(0),
       quantity: new FormControl(0),
@@ -56,6 +62,9 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
       discount: new FormControl(0),
       originalPrice: new FormControl(0)
     });
+
+
+    this.currentCartObject = new OrderDetail(0,null,null,null,null,0,0,0,null,null,null,null);
 
   }
 
@@ -69,7 +78,7 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
     }, (error) => {
       console.log(error);
     })
-  
+
     this.showCat1div = true;
     this.showCat2div = false;
     this.showCat3div = false;
@@ -81,8 +90,8 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
       this.products = response;
       console.log(this.products);
     }, (error) => {
-        console.log(error);
-      })
+      console.log(error);
+    })
   }
 
 
@@ -148,19 +157,62 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
 
 
 
+
+  onQuantityDecrementClick() {
+    if (this.viewProductForm.get('quantity').value != 1) {
+      this.currentQuantity = Number(this.viewProductForm.get('quantity').value) - 1;
+      this.viewProductForm.patchValue({
+        quantity: this.currentQuantity
+      });
+    }
+  }
+
+  onQuantityIncrementClick() {
+    if (this.viewProductForm.get('quantity').value < this.maxStock) {
+      this.currentQuantity = Number(this.viewProductForm.get('quantity').value) + 1;
+      this.viewProductForm.patchValue({
+        quantity: this.currentQuantity
+      });
+    }
+  }
+
+
+  //(change) = "onQuantityChange(index)"
+
+  onQuantityChange() {
+
+
+
+  }
+
+
+
+
+
   onClickViewDetails(index) {
     this.discountAv = this.products[index].discountPercentage;
     if (this.discountAv != 0) {
       this.viewDiscountedPrice = true;
-
-     this.price = this.products[index].sellingPrice * (1 - this.discountAv / 100);
+      
+      this.price = this.products[index].sellingPrice * (1 - this.discountAv / 100);
+      //this.currentCartObject.unitPrice = this.price;
     }
     if (this.discountAv == 0) {
       this.viewDiscountedPrice = false;
-    
+
       this.price = this.products[index].sellingPrice;
+     
+    //  this.currentCartObject.unitPrice = this.products[index].sellingPrice;
     }
     this.viewProductForm.reset();
+    this.currentIndex = index;
+    this.maxStock = this.products[index].stock;
+    this.actualSellingPrice = this.price;
+    //this.currentCartObject.productID = this.products[index].productID;
+    //this.currentCartObject.productName = this.products[index].productName;
+
+
+
     this.viewProductForm.patchValue({
       //id: this.products[index].id,
       //productID: this.products[index].productID,
@@ -170,12 +222,56 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
       techSpecs: this.products[index].techSpecs,
       discount: this.products[index].discountPercentage,
       sellingPrice: this.price,
-      originalPrice: this.products[index].sellingPrice
+      originalPrice: this.products[index].sellingPrice,
+      quantity: 1
       //quantity : 
     });
 
+
+
+  }
+
+
+  onClickAddToCart() {
+    let x: number;
+    this.orderDetailService.GetAllOrderDetails().subscribe((getResponse) => {
+
+      this.orderDetailsForId = getResponse;
+      x = this.orderDetailsForId.length;
+      console.log(this.orderDetailsForId);
+    }, (error) => {
+      console.log(error);
+    });
+    this.currentCartObject.id = x;
+    this.currentCartObject.productID = this.products[this.currentIndex].productID;
+    console.log(this.currentCartObject.productID);
+    this.currentCartObject.productName = this.products[this.currentIndex].productName;
+    console.log(this.currentCartObject.productName);
+    this.currentCartObject.quantity = this.viewProductForm.get('quantity').value;
+    console.log(this.currentCartObject.quantity);
+    this.currentCartObject.unitPrice = this.actualSellingPrice;
+    console.log(this.currentCartObject.unitPrice);
+    this.currentCartObject.totalPrice = this.currentCartObject.quantity * this.currentCartObject.unitPrice;
+    console.log(this.currentCartObject.totalPrice);
+    this.currentCartObject.status = "In Cart";
+
     
-    
+   
+
+    this.orderDetailService.AddOrderDetail(this.currentCartObject).subscribe((addResponse) => {
+      this.orderDetailService.GetAllOrderDetails().subscribe((getResponse) => {
+
+        this.orderDetails = getResponse;
+        console.log(this.orderDetails);
+      }, (error) => {
+        console.log(error);
+      });
+    },
+      (error) => {
+        console.log(error);
+      
+      });
+
   }
 
   //onEditSupplierClick(index) {
