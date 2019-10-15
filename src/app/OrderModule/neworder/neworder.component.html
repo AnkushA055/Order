@@ -9,97 +9,149 @@
 <div>
   <button type="button" class="btn btn-outline-primary col-2 mt-1 mr-2" (click)="onClickCat1()"><b>Camping Equipment</b></button>
   <button type="button" class="btn btn-outline-primary col-2 mt-1 mr-2" (click)="onClickCat2()"><b>Golf Equipment</b></button>
-  <button type="button" class="btn btn-outline-primary col-2 mt-1 mr-2" (click)="onClickCat3()"><b>Mountaineering Equipment</b></button>
+  <button type="button" class="btn btn-outline-primary col-3 mt-1 mr-2" (click)="onClickCat3()"><b>Mountaineering Equipment</b></button>
   <button type="button" class="btn btn-outline-primary col-2 mt-1 mr-2" (click)="onClickCat4()"><b>Outdoor Protection</b></button>
   <button type="button" class="btn btn-outline-primary col-2 mt-1 mr-2" (click)="onClickCat5()"><b>Personal Accessories</b></button>
-  <button type="button" class="btn btn-outline-success mt-1 mr-2" style="float:right">Cart</button>
+  <button type="button" class="btn btn-success mt-1 mr-2" style="float:right" data-toggle="modal" data-target="#viewCartModal" (click)="onClickCart()">Cart</button>
 </div>
 
 
-<div  class = "row"  *ngIf="showCat1div || showCat2div || showCat3div || showCat4div || showCat5div">
-  <div class="card mt-4 ml-2 mr-2" *ngFor="let product of products; let index = index" style="width: 18rem; height : 10rem">
-    <img src="{{product.image}}" class="card-img-top" alt="...">
-    <div class="card-body">
-      <h5 class="card-title">{{product.productName}}</h5>
-      <p class="card-text">Price : {{product.sellingPrice}}</p>
-
-      <!-- Trigger Product Details modal -->
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#viewProductModal" (click)="onClickViewDetails(index)">
-        View Product Details
-      </button>
-
-    </div>
-  </div>
-</div>
-
-<!-- Product Details Modal -->
-<form [formGroup]="viewProductForm">
-  <div class="modal fade" id="viewProductModal" tabindex="-1" role="dialog" aria-labelledby="viewProductModalTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-lg-centered" role="document">
+<!-- Cart modal -->
+<!--<form [formGroup]="viewCartForm">-->
+  <div class="modal fade " id="viewCartModal" tabindex="-1" role="dialog" aria-labelledby="viewCartModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg-centered mw-100 w-75">
       <div class="modal-content">
-        <div class="modal-header bg-light ">
-          <h5 style="align-content  : center" class="modal-title " id="productModalTitle"><b>Details</b></h5>
+        <div class="modal-header " style="background-color:coral">
+          <h5 style="align-content  : center" class="modal-title " id="productModalTitle"><b>My Cart</b></h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-
-          <div class="form-group form-row">
-            <label for="size" class="col-form-label col-md-4">Size :</label>
-            <div class="col-md-8">
-              <input type="text" style="border:none" disabled="disabled" class="form-control" id="size" formControlName="size" />
-            </div>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">No.</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Price</th>
+                <th scope="col">Shipping Address</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let cartDetail of cartDetails; let index = index">
+                <th scope="row">{{index+1}}</th>
+                <td>{{cartDetail.productName}}</td>
+                <td>{{cartDetail.quantity}}</td>
+                <td>{{cartDetail.totalPrice}}</td>
+                <td>4000</td>
+                <td><button class="btn btn-secondary" (click)="onRemoveFromCart(index)">Remove</button></td>
+              </tr>
+          </table>
           </div>
-
-          <div class="form-group form-row">
-            <label for="colour" class="col-form-label col-md-4">Colour :</label>
-            <div class="col-md-8">
-              <input type="text" disabled="disabled" class="form-control" id="colour" formControlName="colour" />
-            </div>
-          </div>
-
-          <div class="form-group form-row">
-            <label for="techSpecs" class="col-form-label col-md-4">Technical Specifications :</label>
-            <div class="col-md-8">
-              <input type="text" disabled="disabled" class="form-control" id="techSpecs" formControlName="techSpecs" />
-            </div>
-          </div>
-
-          <div class="form-group form-row">
-            <label for="originalPrice" class="col-form-label col-md-4">Price :</label>
-            <div class="col-md-8">
-              <input type="text" disabled="disabled" class="form-control" id="originalPrice" formControlName="originalPrice" />
-            </div>
-          </div>
-
-
-          <div class="form-group form-row" *ngIf="viewDiscountedPrice">
-            <label for="discountedPrice" class="col-form-label col-md-4">Current Price :</label>
-            <div class="col-md-8">
-              <input type="text" style="color:darkgreen" disabled="disabled" class="form-control" id="discountedPrice" formControlName="sellingPrice" />
-            </div>
-          </div>
-
-
-          <div class="input-group input-group-sm mb-3 col-xs-2" style="width:60%; ">
-            <div class="input-group-prepend input-group-sm">
-              <span type = "button" class="input-group-btn hand-icon form-control" id="subtract" (click)="onQuantityDecrementClick()">-</span>
-            </div>
-            <input type="text" disabled="disabled" class="form-control col-2" formControlName="quantity"/>
-            <div class="input-group-append input-group-sm">
-              <span type ="button"class="input-group-btn  hand-icon form-control" id="add" (click)="onQuantityIncrementClick()">+</span>
-            </div>
-          </div>
-
-
           <div class="modal-footer">
+            
+            <button type="button" class="btn btn-primary" style="background-color:coral; border-color:coral" ><b>Proceed To Payment</b></button>
+          </div>
+        </div>
+        </div>
+  </div>
+  <!--</form>-->
 
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" (click)="onClickAddToCart()">Add To Cart</button>
+
+
+
+
+
+
+
+
+
+  <div class="row" *ngIf="showCat1div || showCat2div || showCat3div || showCat4div || showCat5div">
+    <div class="card mt-4 ml-2 mr-2" *ngFor="let product of products; let index = index" style="width: 18rem; height : 10rem">
+      <img src="{{product.image}}" class="card-img-top" alt="...">
+      <div class="card-body">
+        <h5 class="card-title">{{product.productName}}</h5>
+        <p class="card-text">Price : {{product.sellingPrice}}</p>
+
+        <!-- Trigger Product Details modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#viewProductModal" (click)="onClickViewDetails(index)">
+          View Product Details
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Details Modal -->
+  <form [formGroup]="viewProductForm">
+    <div class="modal fade" id="viewProductModal" tabindex="-1" role="dialog" aria-labelledby="viewProductModalTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-lg-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-light ">
+            <h5 style="align-content  : center" class="modal-title " id="productModalTitle"><b>Details</b></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+
+            <div class="form-group form-row">
+              <label for="size" class="col-form-label col-md-4">Size :</label>
+              <div class="col-md-8">
+                <input type="text" style="border:none" disabled="disabled" class="form-control" id="size" formControlName="size" />
+              </div>
+            </div>
+
+            <div class="form-group form-row">
+              <label for="colour" class="col-form-label col-md-4">Colour :</label>
+              <div class="col-md-8">
+                <input type="text" disabled="disabled" class="form-control" id="colour" formControlName="colour" />
+              </div>
+            </div>
+
+            <div class="form-group form-row">
+              <label for="techSpecs" class="col-form-label col-md-4">Technical Specifications :</label>
+              <div class="col-md-8">
+                <input type="text" disabled="disabled" class="form-control" id="techSpecs" formControlName="techSpecs" />
+              </div>
+            </div>
+
+            <div class="form-group form-row">
+              <label for="originalPrice" class="col-form-label col-md-4">Price :</label>
+              <div class="col-md-8">
+                <input type="text" disabled="disabled" class="form-control" id="originalPrice" formControlName="originalPrice" />
+              </div>
+            </div>
+
+
+            <div class="form-group form-row" *ngIf="viewDiscountedPrice">
+              <label for="discountedPrice" class="col-form-label col-md-4">Current Price :</label>
+              <div class="col-md-8">
+                <input type="text" style="color:darkgreen" disabled="disabled" class="form-control" id="discountedPrice" formControlName="sellingPrice" />
+              </div>
+            </div>
+
+
+            <div class="input-group input-group-sm mb-3 col-xs-2" style="width:60%; ">
+              <div class="input-group-prepend input-group-sm">
+                <span type="button" class="input-group-btn hand-icon form-control" id="subtract" (click)="onQuantityDecrementClick()">-</span>
+              </div>
+              <input type="text" disabled="disabled" class="form-control col-2" formControlName="quantity" />
+              <div class="input-group-append input-group-sm">
+                <span type="button" class="input-group-btn  hand-icon form-control" id="add" (click)="onQuantityIncrementClick()">+</span>
+              </div>
+            </div>
+
+
+            <div class="modal-footer">
+
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" id="closeDetailModal">Close</button>
+              <button type="button" class="btn btn-primary" (click)="onClickAddToCart()">Add To Cart</button>
+            </div>
           </div>
         </div>
       </div>
-  </div>
     </div>
-</form>
+  </form>

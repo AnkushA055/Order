@@ -15,7 +15,7 @@ export class OrdersService {
     order.creationDateTime = new Date().toLocaleDateString();
     order.orderDate = new Date().toLocaleDateString();
     order.lastModifiedDateTime = new Date().toLocaleDateString();
-    order.orderID = this.uuidv4();
+    //order.orderID = this.uuidv4();
     return this.httpClient.post<boolean>(`/api/orders`, order);
   }
 
@@ -75,7 +75,7 @@ export class OrderDetailsService {
   }
 
   DeleteOrderDetail(orderDetailID: string, id: number): Observable<boolean> {
-    return this.httpClient.delete<boolean>(`/api/orders/${id}`);
+    return this.httpClient.delete<boolean>(`/api/orderDetails/${id}`);
   }
 
   GetAllOrderDetails(): Observable<OrderDetail[]> {

@@ -29,7 +29,9 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
   orderDetails: OrderDetail[] = [];
   products: Product[] = [];
   orderDetailsForId: OrderDetail[] = [];
-
+  orderID: string;
+  totalCartValue: number;
+  cartDetails: OrderDetail[] = [];
 
 
   ngOnInit() { };
@@ -44,7 +46,7 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
  
 
 
-  constructor(private productsService: ProductsService,private orderDetailService : OrderDetailsService) {
+  constructor(private productsService: ProductsService, private orderDetailService: OrderDetailsService, private orderService: OrdersService) {
 
     super();
     //constructor for viewing product specific details
@@ -64,8 +66,9 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
     });
 
 
-    this.currentCartObject = new OrderDetail(0,null,null,null,null,0,0,0,null,null,null,null);
-
+    this.currentCartObject = new OrderDetail(0, null, null, null, null, 0, 0, 0, null, null, null, null);
+    this.orderID = this.orderService.uuidv4();
+    this.totalCartValue = 0;
   }
 
 
@@ -156,6 +159,24 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
   }
 
 
+  onClickCart() {
+
+    this.orderDetailService.GetOrderDetailsByOrderID(this.orderID).subscribe((getDetails) => {
+
+      this.cartDetails = getDetails;
+  
+    }, (error) => {
+      console.log(error);
+    });
+
+
+  }
+
+  onClickProceedToPayment() {
+
+
+
+  }
 
 
   onQuantityDecrementClick() {
@@ -188,7 +209,25 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
 
 
 
+  onRemoveFromCart(index) {
+    this.totalCartValue = this.totalCartValue - this.cartDetails[index].totalPrice;
+    this.orderDetailService.DeleteOrderDetail(this.cartDetails[index].orderDetailID, this.cartDetails[index].id).subscribe((deletedResponse) => {
+      
+      this.orderDetailService.GetOrderDetailsByOrderID(this.orderID).subscribe((getDetails) => {
 
+        this.cartDetails = getDetails;
+        console.log(this.cartDetails);
+
+      }, (error) => {
+        console.log(error);
+      });
+      
+
+    }, (error) => {
+      console.log(error);
+    });
+
+      }
   onClickViewDetails(index) {
     this.discountAv = this.products[index].discountPercentage;
     if (this.discountAv != 0) {
@@ -233,16 +272,18 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
 
 
   onClickAddToCart() {
-    let x: number;
+   
     this.orderDetailService.GetAllOrderDetails().subscribe((getResponse) => {
 
       this.orderDetailsForId = getResponse;
-      x = this.orderDetailsForId.length;
+    
       console.log(this.orderDetailsForId);
     }, (error) => {
       console.log(error);
     });
-    this.currentCartObject.id = x;
+    this.currentCartObject.id = (this.orderDetailsForId.length) + 2000;
+    console.log(this.currentCartObject.id);
+    this.currentCartObject.orderID = this.orderID;
     this.currentCartObject.productID = this.products[this.currentIndex].productID;
     console.log(this.currentCartObject.productID);
     this.currentCartObject.productName = this.products[this.currentIndex].productName;
@@ -265,7 +306,9 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
         console.log(this.orderDetails);
       }, (error) => {
         console.log(error);
-      });
+        });
+      $("#closeDetailModal").trigger("click");
+      this.totalCartValue = this.totalCartValue + this.currentCartObject.totalPrice;
     },
       (error) => {
         console.log(error);
