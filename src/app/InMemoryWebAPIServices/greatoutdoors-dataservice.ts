@@ -3,6 +3,7 @@ import { InMemoryDbService } from 'angular-in-memory-web-api';
 import { Order } from '../Models/Order';
 import { OrderDetail } from '../Models/Order';
 import { Product } from '../Models/Product';
+import { Address } from '../Models/Address';
 
 
 @Injectable({
@@ -24,6 +25,13 @@ export class GreatOutdoorsDataService implements InMemoryDbService {
       new OrderDetail(3, "101012", "1010", "2010", "A", 5, 1200, 6000, "InCart", "10", "01/01/2018", "02/01/2018"),
     ];
 
+    let addresses = [
+      new Address(1, "C628855C-FE7A-4D94-A1BB-167157D3F4EA", "CKP", "Airoli", "Thane", "Mumbai", "Maharastra", "407008", "401476EE-0A3B-482E-BD5B-B94A32355959", "10/3/2019", "10/4/2019"),
+      new Address(2, "6D68849C-8FA8-4049-A111-B431C76C6548", "Yesomite", "Airoli", "Thane", "Mumbai", "Maharastra", "407008", "401476EE-0A3B-482E-BD5B-B94A32355959", "10/3/2019", "10/4/2019"),
+      new Address(3, "53E8748F-61D6-494B-BF72-E18B27511EFA", "Andheri", "Airoli", "Thane", "Mumbai", "Maharastra", "407008", "401476EE-0A3B-482E-BD5B-B94A32355959", "10/3/2019", "10/4/2019"),
+
+    ];
+
     let products = [
       new Product(1, "2010", "BCKPCK", "Back Pack", "Camping Equipment", "assets/images/1.jpg", 15, "Small", "Black", "Material - Polyester, Strap - Adjustable",
         1000, 1200, 0),
@@ -43,6 +51,6 @@ export class GreatOutdoorsDataService implements InMemoryDbService {
         500, 700, 5),
 
     ];
-    return { orders, orderDetails, products };
+    return { orders, orderDetails, products, addresses };
   }
 }

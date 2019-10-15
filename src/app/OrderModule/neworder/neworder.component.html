@@ -20,14 +20,23 @@
 <!--<form [formGroup]="viewCartForm">-->
   <div class="modal fade " id="viewCartModal" tabindex="-1" role="dialog" aria-labelledby="viewCartModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-lg-centered mw-100 w-75">
+     
       <div class="modal-content">
         <div class="modal-header " style="background-color:coral">
-          <h5 style="align-content  : center" class="modal-title " id="productModalTitle"><b>My Cart</b></h5>
+          <h5 class="modal-title" id="productModalTitle"><b>My Cart</b></h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body" *ngIf="cartEmpty">
+          <h5 style="text-align:center"><b>Cart Is Empty</b></h5>
+
+        </div>
+        <div class="modal-body" *ngIf="thankMessage">
+          <h5 style="text-align:center; color:midnightblue"><b>Thank You!!!</b></h5>
+
+        </div>
+        <div *ngIf="cartNotEmpty" class="modal-body">
           <table class="table table-striped">
             <thead>
               <tr>
@@ -40,21 +49,29 @@
               </tr>
             </thead>
             <tbody>
+              <!--<form [formGroup]="getAddressForm">-->
               <tr *ngFor="let cartDetail of cartDetails; let index = index">
                 <th scope="row">{{index+1}}</th>
                 <td>{{cartDetail.productName}}</td>
                 <td>{{cartDetail.quantity}}</td>
                 <td>{{cartDetail.totalPrice}}</td>
-                <td>4000</td>
-                <td><button class="btn btn-secondary" (click)="onRemoveFromCart(index)">Remove</button></td>
+                <td>
+                  <select id="selectedAddress" (click)="onClickSelectAddress(index)"> select address
+                   
+                    <option  *ngFor ="let address of currentRetailerAddreses; let i = index" value="{{address.addressID}}" (click)="onSelectAddress(i)">{{address.addressLine1}}, {{address.addressLine2}}, {{address.city}}, {{address.state}}, {{address.pinCode}}</option>
+                   
+                  </select>
+                </td>
+                <td><button class="btn btn-secondary" id="removeFromorderDetail" (click)="onRemoveFromCart(index)">Remove</button></td>
               </tr>
           </table>
-          </div>
-          <div class="modal-footer">
-            
-            <button type="button" class="btn btn-primary" style="background-color:coral; border-color:coral" ><b>Proceed To Payment</b></button>
-          </div>
         </div>
+        <div class="modal-footer" *ngIf="cartNotEmpty">
+          <input type="text" style="border:none; font-weight:bold" disabled="disabled" class="col-3 mr-auto" id="size" value="Total Cart Value : {{totalCartValue}}" />
+          <button type="button" class="btn btn-primary" style="background-color:coral; border-color:coral" (click)="onClickProceedToPayment()"><b>Proceed To Payment</b></button>
+          <button type="button" class="btn btn-primary" id="emptyCart" style="background-color:dimgray; border-color:dimgray" (click)="onEmptyCart()">Empty Cart</button>
+        </div>
+      </div>
         </div>
   </div>
   <!--</form>-->

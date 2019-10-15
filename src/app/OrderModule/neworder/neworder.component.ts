@@ -7,6 +7,8 @@ import * as $ from "jquery";
 import { GreatOutdoorsComponentBase } from '../../greatoutdoors-component';
 import { ProductsService } from '../../Services/products.service';
 import { Product } from '../../Models/Product';
+import { Address } from '../../Models/Address';
+import { AddressesService } from '../../Services/addresses.service'
 
 @Component({
   selector: 'app-neworder',
@@ -14,14 +16,22 @@ import { Product } from '../../Models/Product';
   styleUrls: ['./neworder.component.scss']
 })
 export class NewOrdersComponent extends GreatOutdoorsComponentBase implements OnInit {
+  //retailerId:string =
+    //Using this for storing current retailer
 
-  viewProductForm: FormGroup;
-  viewDiscountedPrice: boolean = false;
+  //view Details of Products
+    viewProductForm: FormGroup;
+
+    //if discount available 
+    viewDiscountedPrice: boolean = false;
+
+    //
   viewOriginalPrice: boolean = true;
   discountAv: number = 0;
   price: number;
   currentProduct: OrderDetail;
   currentCartObject: OrderDetail;
+  currentOrder: Order;
   currentIndex: number;
   currentQuantity: number = 1;
   maxStock: number = 0;
@@ -32,9 +42,22 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
   orderID: string;
   totalCartValue: number;
   cartDetails: OrderDetail[] = [];
+  cartEmpty: boolean = true;
+  cartNotEmpty: boolean = false;
+  totalCartQuantity: number;
+  thankMessage: boolean = false;
+  currentRetailerAddreses: Address[] = [];
+  selectedCartProduct: number;
+  selectedCartProductAddress: number;
+    orderDetailWithAddress: OrderDetail;
+    //if Address not taken in any product
+    loop: boolean;
+    addressErrorMessage: string;
+    showAddressErrorMessage: boolean;
 
 
-  ngOnInit() { };
+
+
 
   showCat1div: boolean = false;
   showCat2div: boolean = false;
@@ -44,9 +67,9 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
   categorySelected: string;
   //product response
  
+  ngOnInit() { };
 
-
-  constructor(private productsService: ProductsService, private orderDetailService: OrderDetailsService, private orderService: OrdersService) {
+  constructor(private addressesService: AddressesService, private productsService: ProductsService, private orderDetailService: OrderDetailsService, private orderService: OrdersService) {
 
     super();
     //constructor for viewing product specific details
@@ -65,10 +88,13 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
       originalPrice: new FormControl(0)
     });
 
-
+    this.orderDetailWithAddress = new OrderDetail(0, null, null, null, null, 0, 0, 0, null, null, null, null);
     this.currentCartObject = new OrderDetail(0, null, null, null, null, 0, 0, 0, null, null, null, null);
     this.orderID = this.orderService.uuidv4();
     this.totalCartValue = 0;
+    this.totalCartQuantity = 0;
+      this.currentOrder = new Order(0, null, null, null, null, 0, null, 0, null, null);
+      this.addressErrorMessage = null;
   }
 
 
@@ -159,24 +185,44 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
   }
 
 
+  onClickSelectAddress(index) {
+    this.selectedCartProduct = index;
+
+  }
+
+  onSelectAddress(i) {
+    this.selectedCartProductAddress = i;
+    this.cartDetails[this.selectedCartProduct].addressID = this.currentRetailerAddreses[this.selectedCartProductAddress].addressID;
+  }
+
+
+
   onClickCart() {
 
     this.orderDetailService.GetOrderDetailsByOrderID(this.orderID).subscribe((getDetails) => {
+      this.thankMessage = false;
+      if (getDetails.length != 0) {
+        this.cartEmpty = false;
+        this.cartNotEmpty = true;
+      }
+      else {
+        this.cartEmpty = true;
+          this.cartNotEmpty = false;
+          this.showAddressErrorMessage = false;
+      }
 
       this.cartDetails = getDetails;
+      
   
     }, (error) => {
       console.log(error);
     });
 
-
+      this.addressesService.GetAddressByRetailerID("401476EE-0A3B-482E-BD5B-B94A32355959").subscribe((addressResponse) => {
+      this.currentRetailerAddreses = addressResponse;
+    });
   }
-
-  onClickProceedToPayment() {
-
-
-
-  }
+  
 
 
   onQuantityDecrementClick() {
@@ -200,21 +246,20 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
 
   //(change) = "onQuantityChange(index)"
 
-  onQuantityChange() {
-
-
-
-  }
 
 
 
 
   onRemoveFromCart(index) {
     this.totalCartValue = this.totalCartValue - this.cartDetails[index].totalPrice;
+    this.totalCartQuantity = this.totalCartQuantity - this.cartDetails[index].quantity;
     this.orderDetailService.DeleteOrderDetail(this.cartDetails[index].orderDetailID, this.cartDetails[index].id).subscribe((deletedResponse) => {
       
       this.orderDetailService.GetOrderDetailsByOrderID(this.orderID).subscribe((getDetails) => {
-
+        if (getDetails.length == 0) {
+          this.cartEmpty = true;
+          this.cartNotEmpty = false;
+        }
         this.cartDetails = getDetails;
         console.log(this.cartDetails);
 
@@ -227,7 +272,9 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
       console.log(error);
     });
 
-      }
+  }
+
+
   onClickViewDetails(index) {
     this.discountAv = this.products[index].discountPercentage;
     if (this.discountAv != 0) {
@@ -247,6 +294,7 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
     this.currentIndex = index;
     this.maxStock = this.products[index].stock;
     this.actualSellingPrice = this.price;
+    
     //this.currentCartObject.productID = this.products[index].productID;
     //this.currentCartObject.productName = this.products[index].productName;
 
@@ -309,6 +357,7 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
         });
       $("#closeDetailModal").trigger("click");
       this.totalCartValue = this.totalCartValue + this.currentCartObject.totalPrice;
+      this.totalCartQuantity = this.totalCartQuantity = this.currentCartObject.quantity;
     },
       (error) => {
         console.log(error);
@@ -317,6 +366,87 @@ export class NewOrdersComponent extends GreatOutdoorsComponentBase implements On
 
   }
 
+
+
+
+  onClickProceedToPayment() {
+    this.orderService.GetAllOrders().subscribe((response) => {
+      this.currentOrder.id = 1000 + response.length;
+    });
+      this.loop = true;
+      this.showAddressErrorMessage = false;
+    this.currentOrder.orderID = this.orderID;
+    this.currentOrder.totalAmount = this.totalCartValue;
+    this.currentOrder.totalQuantity = this.totalCartQuantity;
+    this.currentOrder.channelOfSale = "Online";
+      this.currentOrder.retailerID = "401476EE-0A3B-482E-BD5B-B94A32355959";
+   
+      let x: number;
+      for (x = 0; x < this.cartDetails.length; x++) {
+          if (this.loop == true) {
+              
+              if (this.cartDetails[x].addressID != null) {
+                  this.showAddressErrorMessage = false;
+                  this.cartDetails[x].status = "Under Processing";
+                  this.orderDetailService.UpdateOrderDetail(this.cartDetails[x]).subscribe((response) => {
+                      this.loop = response;
+                      console.log(this.cartDetails[x]);
+                      console.log("Order Detail Added Succesfully");
+                      this.orderDetailService.GetAllOrderDetails().subscribe((responseAll) => {
+
+                          console.log(responseAll);
+                      });
+                  });
+              }
+              else { 
+                  this.addressErrorMessage = "Please Enter Address At " + (x + 1) + " position.";
+                  console.log(this.addressErrorMessage);
+                  this.showAddressErrorMessage = true;
+                  this.loop = false;
+              }
+          }
+          else
+              x = this.cartDetails.length + 1;
+      }
+      if (this.loop == true) {
+
+          this.orderService.AddOrder(this.currentOrder).subscribe((addResponse) => {
+              console.log(this.currentOrder);
+              console.log("Order Succesfully Added");
+              this.orderService.GetAllOrders().subscribe((responseAll) => {
+
+                  console.log(responseAll);
+              });
+              this.orderID = this.orderService.uuidv4();
+              this.thankMessage = true;
+              this.cartNotEmpty = false;
+              this.totalCartQuantity = 0;
+              this.totalCartValue = 0;
+          });
+      }
+  }
+
+
+
+  onEmptyCart() {
+     
+    let i: number;
+    for (i = 0; i < this.cartDetails.length; i++) {
+      console.log(this.cartDetails[i]);
+      this.orderDetailService.DeleteOrderDetail(this.cartDetails[i].orderDetailID, this.cartDetails[i].id).subscribe((delResponse) => {
+
+        this.cartEmpty = true;
+        this.cartNotEmpty = false;
+
+      });
+    }
+    this.totalCartValue = 0;
+    this.totalCartQuantity = 0;
+   
+
+  }
+
+ 
   //onEditSupplierClick(index) {
   //  this.editSupplierForm.reset();
   //  this.editSupplierForm["submitted"] = false;
