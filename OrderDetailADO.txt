@@ -1,0 +1,391 @@
+using Capgemini.GreatOutdoors.Contracts.DALContracts;
+using Capgemini.GreatOutdoors.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Data.SqlClient;
+using System.Data;
+using Capgemini.GreatOutdoors.DataAccessLayer;
+using Capgemini.GreatOutdoors.Exceptions;
+
+namespace Capgemini.GreatOutdoors.DAL
+{
+
+    /// <summary>
+    /// Contains data access layer methods for inserting, updating, deleting OrderDetailss from OrderDetailss collection.
+    /// </summary>
+    public class OrderDetailsDAL : OrderDetailsDALBase, IDisposable
+    {
+
+        SqlConnection sqlConn = new SqlConnection(DataAccessLayer.Properties.Settings.Default.dbCon);
+        /// <summary>
+        /// Adds new OrderDetails to OrderDetails collection.
+        /// </summary>
+        /// <param name="newOrderDetails">Contains the OrderDetails details to be added.</param>
+        /// <returns>Determinates whether the new OrderDetails is added.</returns>
+        public override bool AddOrderDetailsDAL(OrderDetail newOrderDetails)
+        {
+            bool OrderDetailsAdded = false;
+            try
+            {
+
+                sqlConn.Open();
+                newOrderDetails.OrderDetailID = Guid.NewGuid();
+                string query = "[13th Aug CLoud PT Immersive].TeamA.AddOrderDetails";
+                SqlCommand cmd = new SqlCommand(query, sqlConn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@orderDetailID", newOrderDetails.OrderDetailID);
+                cmd.Parameters.AddWithValue("@orderID", newOrderDetails.OrderID);
+                cmd.Parameters.AddWithValue("@productID", newOrderDetails.ProductID);
+                cmd.Parameters.AddWithValue("@quantity", newOrderDetails.Quantity);
+                cmd.Parameters.AddWithValue("@discountedUnitPrice", newOrderDetails.UnitPrice);
+                cmd.Parameters.AddWithValue("@totalPrice", newOrderDetails.TotalPrice);
+                cmd.Parameters.AddWithValue("@giftPacking", newOrderDetails.GiftPacking);
+                cmd.Parameters.AddWithValue("@addressID", newOrderDetails.AddressID);
+
+
+                int rows = cmd.ExecuteNonQuery();
+
+                if (rows == 1)
+                    OrderDetailsAdded = true;
+                sqlConn.Close();
+            }
+            catch (GreatOutdoorsException ex)
+            {
+                throw ex;
+            }
+
+
+            //newOrderDetails.OrderDetailID = Guid.NewGuid();
+            //newOrderDetails.Status = ProductStatus.InCart;
+            //OrderDetailsList.Add(newOrderDetails);
+            //OrderDetailsAdded = true;
+
+            return OrderDetailsAdded;
+        }
+
+
+        public override List<OrderDetail> GetAllOrderDetailsDAL()
+        {
+            List<OrderDetail> orderDetails = new List<OrderDetail>();
+
+            try
+            {
+                sqlConn.Open();
+
+                string query = "TeamA.GetAllOrderDetails";
+                SqlCommand cmd = new SqlCommand(query, sqlConn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                DataSet dtSet = new DataSet();
+                SqlDataAdapter adp = new SqlDataAdapter(cmd);
+
+
+                adp.Fill(dtSet);
+
+
+                for (int i = 0; i < dtSet.Tables[0].Rows.Count; i++)
+                {
+                    DataRow row = dtSet.Tables[0].Rows[i];
+                    OrderDetail orderDetail = new OrderDetail();
+                    orderDetail.OrderDetailID = (Guid)row["OrderDetailID"];
+                    orderDetail.OrderID = (Guid)row["OrderID"];
+                    orderDetail.ProductID = (Guid)row["ProductID"];
+                    orderDetail.Quantity = Convert.ToInt32(row["Quantity"]);
+                    orderDetail.UnitPrice = Convert.ToInt32(row["DiscountedUnitPrice"]);
+                    orderDetail.TotalPrice = Convert.ToInt32(row["TotalPrice"]);
+                    orderDetail.GiftPacking = Convert.ToString(row["GiftPacking"]);
+                    orderDetail.AddressID = (Guid)row["AddressID"];
+                    Enum.TryParse(Convert.ToString(row["CurrentStatus"]), out ProductStatus statusObtained);
+                    orderDetail.Status = statusObtained;
+
+                    orderDetails.Add(orderDetail);
+
+                }
+
+                sqlConn.Close();
+            }
+
+            catch (GreatOutdoorsException ex)
+            {
+                throw ex;
+            }
+
+            return orderDetails;
+        }
+
+        /// <summary>
+        /// Gets OrderDetails based on OrderID.
+        /// </summary>
+        /// <param name="searchOrderID">Represents OrderDetailsID to search.</param>
+        /// <returns>Returns List of OrderDetails object.</returns>
+        public override List<OrderDetail> GetOrderDetailsByOrderIDDAL(Guid searchOrderID)
+        {
+
+
+            List<OrderDetail> orderDetails = new List<OrderDetail>();
+            try
+            {
+                //Find Order Details based on orderID
+                sqlConn.Open();
+
+                string query = "TeamA.GetOrderDetailsByOrderID";
+                SqlCommand cmd = new SqlCommand(query, sqlConn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                DataSet dtSet = new DataSet();
+                SqlDataAdapter adp = new SqlDataAdapter(cmd);
+
+
+                adp.Fill(dtSet);
+
+
+                for (int i = 0; i < dtSet.Tables[0].Rows.Count; i++)
+                {
+                    DataRow row = dtSet.Tables[0].Rows[i];
+                    OrderDetail orderDetail = new OrderDetail();
+                    orderDetail.OrderDetailID = (Guid)row["OrderDetailID"];
+                    orderDetail.OrderID = (Guid)row["OrderID"];
+                    orderDetail.ProductID = (Guid)row["ProductID"];
+                    orderDetail.Quantity = Convert.ToInt32(row["Quantity"]);
+                    orderDetail.UnitPrice = Convert.ToInt32(row["DiscountedUnitPrice"]);
+                    orderDetail.TotalPrice = Convert.ToInt32(row["TotalPrice"]);
+                    orderDetail.GiftPacking = Convert.ToString(row["GiftPacking"]);
+                    orderDetail.AddressID = (Guid)row["AddressID"];
+                    Enum.TryParse(Convert.ToString(row["CurrentStatus"]), out ProductStatus statusObtained);
+                    orderDetail.Status = statusObtained;
+
+                    orderDetails.Add(orderDetail);
+
+                }
+
+                sqlConn.Close();
+            }
+            catch (GreatOutdoorsException)
+            {
+                throw;
+            }
+            return orderDetails;
+        }
+
+        //List<OrderDetail> matchingOrderDetails = null;
+        //try
+        //{
+        //    //Find OrderDetails based on searchOrderDetailsID
+        //    matchingOrderDetails = OrderDetailsList.FindAll(
+        //        (item) => { return item.OrderID == searchOrderID; }
+        //    );
+
+        //}
+        //catch (Exception)
+        //{
+        //    throw;
+        //}
+        //return matchingOrderDetails;
+
+
+        //public override List<OrderDetail> GetAllOrderDetailsDAL()
+        //{
+        //    return OrderDetailsList;
+        //}
+
+        /// <summary>
+        /// Gets OrderDetails based on ProductID.
+        /// </summary>
+        /// <param name="searchProductID">Represents OrderDetailsID to search.</param>
+        /// <returns>Returns OrderDetails object.</returns>
+        //public override List<OrderDetail> GetOrderDetailsByProductIDDAL(Guid searchProductID)
+        //{
+        //    List<OrderDetail> matchingOrderDetails = null;
+        //    try
+        //    {
+        //        //Find OrderDetails based on searchOrderDetailsID
+        //        matchingOrderDetails = OrderDetailsList.FindAll(
+        //            (item) => { return item.OrderDetailID == searchProductID; }
+        //        );
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //    return matchingOrderDetails;
+        //}
+
+        public override List<OrderDetail> GetOrderDetailsByProductIDDAL(Guid searchProductID)
+        {
+            List<OrderDetail> matchingOrderDetails = null;
+            try
+            {
+                //Find OrderDetails based on productID
+                sqlConn.Open();
+
+                string query = "TeamA.GetOrderDetailsByProductID";
+                SqlCommand cmd = new SqlCommand(query, sqlConn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                DataSet dtSet = new DataSet();
+                SqlDataAdapter adp = new SqlDataAdapter(cmd);
+
+
+                adp.Fill(dtSet);
+
+
+                for (int i = 0; i < dtSet.Tables[0].Rows.Count; i++)
+                {
+                    DataRow row = dtSet.Tables[0].Rows[i];
+                    OrderDetail orderDetail = new OrderDetail();
+                    orderDetail.OrderDetailID = (Guid)row["OrderDetailID"];
+                    orderDetail.OrderID = (Guid)row["OrderID"];
+                    orderDetail.ProductID = (Guid)row["ProductID"];
+                    orderDetail.Quantity = Convert.ToInt32(row["Quantity"]);
+                    orderDetail.UnitPrice = Convert.ToInt32(row["DiscountedUnitPrice"]);
+                    orderDetail.TotalPrice = Convert.ToInt32(row["TotalPrice"]);
+                    orderDetail.GiftPacking = Convert.ToString(row["GiftPacking"]);
+                    orderDetail.AddressID = (Guid)row["AddressID"];
+                    Enum.TryParse(Convert.ToString(row["CurrentStatus"]), out ProductStatus statusObtained);
+                    orderDetail.Status = statusObtained;
+
+                    matchingOrderDetails.Add(orderDetail);
+
+                }
+
+                sqlConn.Close();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return matchingOrderDetails;
+        }
+
+
+
+        /// <summary>
+        /// Deletes OrderDetails based on OrderID and ProductID.
+        /// </summary>
+        /// <param name="deleteOrderID">Represents OrderDetailsID to delete.</param>
+        /// <param name="deleteProductID">Represents OrderDetailsID to delete.</param>
+        /// <returns>Determinates whether the existing OrderDetails is updated.</returns>
+        public override bool DeleteOrderDetailsDAL(Guid deleteOrderDetailID)
+        {
+            bool orderDeleted = false;
+            try
+            {
+                sqlConn.Open();
+                string query;
+
+                query = "TeamA.DeleteOrderDetails";
+                SqlCommand sqlcmd = new SqlCommand(query, sqlConn);
+                sqlcmd.CommandType = CommandType.StoredProcedure;
+
+                //Assigning OrderDetailID
+
+                sqlcmd.Parameters.AddWithValue("@orderDetailID", deleteOrderDetailID).DbType = DbType.Guid;
+
+
+                sqlcmd.ExecuteNonQuery();
+
+                orderDeleted = true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+
+                sqlConn.Close();
+
+            }
+            return orderDeleted;
+        }
+
+
+        public override bool DeleteOrderDetailsByOrderID(Guid deleteOrderID)
+        {
+            bool orderDeleted = false;
+            try
+            {
+                sqlConn.Open();
+                string query;
+
+                query = "TeamA.DeleteOrderDetailsByOrderID";
+                SqlCommand sqlcmd = new SqlCommand(query, sqlConn);
+                sqlcmd.CommandType = CommandType.StoredProcedure;
+
+                //Assigning OrderDetailID
+
+                sqlcmd.Parameters.AddWithValue("@orderID", deleteOrderID).DbType = DbType.Guid;
+
+
+                sqlcmd.ExecuteNonQuery();
+
+                orderDeleted = true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+
+                sqlConn.Close();
+
+            }
+            return orderDeleted;
+        }
+
+        public override bool UpdateOrderDetailDAL(Guid orderId, ProductStatus statusChange)
+        {
+            bool updateOrderDetailStatus = false;
+            try
+            {
+
+
+                sqlConn.Open();
+                string query;
+
+                query = "TeamA.UpdateOrderDetail";
+                SqlCommand sqlcmd = new SqlCommand(query, sqlConn);
+                sqlcmd.CommandType = CommandType.StoredProcedure;
+
+                //Assigning OfflineOrderDetailID
+
+                sqlcmd.Parameters.AddWithValue("@currentStatus", Enum.GetName(typeof(ProductStatus), statusChange));
+
+
+
+                sqlcmd.ExecuteNonQuery();
+
+                updateOrderDetailStatus = true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+            return updateOrderDetailStatus;
+
+        }
+
+
+
+
+
+
+        /// <summary>
+        /// Clears unmanaged resources such as db connections or file streams.
+        /// </summary>
+        public void Dispose()
+        {
+            //No unmanaged resources currently
+        }
+    }
+}
+
